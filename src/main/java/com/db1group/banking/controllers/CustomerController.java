@@ -1,12 +1,11 @@
 package com.db1group.banking.controllers;
 
+import com.db1group.banking.models.requests.CustomerRequest;
 import com.db1group.banking.models.responses.CustomerResponse;
 import com.db1group.banking.services.OnboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/customer")
@@ -19,8 +18,19 @@ public class CustomerController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Iterable<CustomerResponse>> getCustomers() {
+    public ResponseEntity<Iterable<CustomerResponse>> getCustomers(
+            @RequestParam(required = false) String securityNumber,
+            @RequestParam(required = false) String rgDocument
+    ) {
+        return ResponseEntity.ok(onboardService.filterCustomers(securityNumber, rgDocument));
+    }
 
-        return ResponseEntity.ok(onboardService.getAll());
+    @PostMapping
+    public ResponseEntity<CustomerResponse> createCustomer(
+            @RequestBody CustomerRequest customerRequest
+    ) {
+        var result = onboardService.createCustomer(customerRequest);
+
+        return ResponseEntity.ok(result);
     }
 }
